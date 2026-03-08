@@ -1,0 +1,43 @@
+name: Go CI
+
+on:
+  push:
+    branches: [ master ]
+  workflow_dispatch:
+  pull_request:
+
+jobs:
+  build-and-test:
+    name: Build and test Go bindings
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+
+    steps:
+    - name: Install C/C++ build dependencies
+      run: |
+        sudo apt-get update -q
+        sudo apt-get install -y build-essential cmake
+
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Build RandomX C library
+      run: |
+        mkdir -p build
+        cd build
+        cmake ..
+        make -j$(nproc) randomx
+
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.22'
+
+    - name: Build Go bindings
+      working-directory: go
+      run: go build ./...
+
+    - name: Run Go tests
+      working-directory: go
+      run: go test -v ./...
