@@ -20,9 +20,6 @@ jobs:
           - {arch: aarch64, branch: latest-stable}
           - {arch: armhf, branch: latest-stable}
           - {arch: armv7, branch: latest-stable}
-          - {arch: ppc64le, branch: latest-stable}
-          - {arch: riscv64, branch: latest-stable}
-          - {arch: s390x, branch: latest-stable}
 
     steps:
     - name: Setup Alpine Linux
@@ -53,6 +50,12 @@ jobs:
       shell: alpine.sh {0}
       run: |
         build/randomx-tests
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: alpine-${{ matrix.config.arch }}-artifacts
+        path: build/randomx-tests
 
   build-ubuntu:
 
@@ -87,6 +90,12 @@ jobs:
     - name: Run tests
       run: |
         build/randomx-tests
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: ubuntu-${{ matrix.config.os }}-artifacts
+        path: build/randomx-tests
 
   build-windows-msys2:
 
@@ -126,6 +135,12 @@ jobs:
       run: |
         build/randomx-tests.exe
 
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: windows-msys2-${{ matrix.config.c }}-artifacts
+        path: build/randomx-tests.exe
+
   build-windows-msbuild:
 
     timeout-minutes: 5
@@ -159,6 +174,12 @@ jobs:
       run: |
         build/Release/randomx-tests.exe
 
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: windows-msbuild-${{ matrix.config.os }}-${{ matrix.config.arch }}-artifacts
+        path: build/Release/randomx-tests.exe
+
   build-macos:
 
     timeout-minutes: 5
@@ -184,6 +205,12 @@ jobs:
     - name: Run tests
       run: |
         build/randomx-tests
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: macos-${{ matrix.os }}-artifacts
+        path: build/randomx-tests
 
   build-freebsd:
 
@@ -224,3 +251,9 @@ jobs:
           cmake ..
           make -j2
           ./randomx-tests
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: freebsd-${{ matrix.os.architecture }}-artifacts
+        path: build/randomx-tests
